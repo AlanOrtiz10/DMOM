@@ -45,7 +45,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             SizedBox(height: 20),
-
               // Campos de entrada para el registro
               TextFormField(
                 controller: nameController,
