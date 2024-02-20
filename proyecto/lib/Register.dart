@@ -3,125 +3,152 @@ import 'HomePage.dart';
 import 'Login.dart';
 
 class RegisterPage extends StatefulWidget {
-    const RegisterPage({Key? key, required this.title}) : super(key: key);
+  const RegisterPage({Key? key, required this.title}) : super(key: key);
 
-    final String title;
+  final String title;
 
-    @override
-    State<RegisterPage> createState() => _RegisterPageState();
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-    TextEditingController nameController = TextEditingController();
-    TextEditingController usernameController = TextEditingController();
-    TextEditingController emailController = TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    TextEditingController phoneController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
-    @override
-    Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Color(0xFF003785), // Color del fondo (azul)
         title: Text(
-            widget.title,
-            style: TextStyle(color: Colors.white),
+          widget.title,
+          style: TextStyle(color: Colors.white),
         ),
-        ),
-        body: Center(
+      ),
+      body: Center(
         child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start, 
             children: <Widget>[
+                Text(
+                'Crea una cuenta',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // Color del texto (blanco)
+                ),
+              ),
+            SizedBox(height: 20),
+
               // Campos de entrada para el registro
-                TextFormField(
+              TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
-                    labelText: 'Nombre Completo',
+                  labelText: 'Nombre Completo',
                 ),
-                ),
-                TextFormField(
+              ),
+              TextFormField(
                 controller: usernameController,
                 decoration: InputDecoration(
-                    labelText: 'Usuario',
+                  labelText: 'Usuario',
                 ),
-                ),
-                TextFormField(
+              ),
+              TextFormField(
                 controller: emailController,
                 decoration: InputDecoration(
-                    labelText: 'Correo electrónico',
+                  labelText: 'Correo electrónico',
                 ),
-                ),
-                TextFormField(
+              ),
+              TextFormField(
                 controller: passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
-                    labelText: 'Contraseña',
+                  labelText: 'Contraseña',
                 ),
-                ),
-                TextFormField(
+              ),
+              TextFormField(
                 controller: phoneController,
                 decoration: InputDecoration(
-                    labelText: 'Número de Celular',
+                  labelText: 'Número de Celular',
                 ),
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
                 onPressed: () {
                   // Validar que no haya campos vacíos
-                    if (nameController.text.isEmpty ||
-                        usernameController.text.isEmpty ||
-                        emailController.text.isEmpty ||
-                        passwordController.text.isEmpty ||
-                        phoneController.text.isEmpty) {
+                  if (nameController.text.isEmpty ||
+                      usernameController.text.isEmpty ||
+                      emailController.text.isEmpty ||
+                      passwordController.text.isEmpty ||
+                      phoneController.text.isEmpty) {
                     // Mostrar un mensaje de error si hay campos vacíos
                     ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                      SnackBar(
                         content: Text('Por favor, completa todos los campos.'),
                         backgroundColor: Colors.red,
-                    ),
+                      ),
                     );
-                    } else {
+                  } else {
                     // Permitir la creación de la cuenta
                     // Aquí puedes agregar lógica adicional según tus necesidades
                     // En este ejemplo, simplemente navega a la página de inicio
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
+                      context,
+                      MaterialPageRoute(
                         builder: (context) => const HomePage(title: 'Inicio'),
-                        ),
+                      ),
                     );
-                    }
+                  }
                 },
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.blue, // Color del fondo del botón
+               style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Color(0xFF003785)), // Color del fondo del botón (azul)
+                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 20)), // Padding horizontal de 10px
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30), // Establecer el border radius a 30px
+                  )),
                 ),
-                child: Text('Crear Cuenta', style: TextStyle(color: Colors.white), 
+                child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Registrarme',
+                    style: TextStyle(color: Colors.white), // Color del texto del botón (blanco)
+                  ),
                 ),
-                ),
-                SizedBox(height: 16),
-                OutlinedButton(
+              ),
+              SizedBox(height: 16),
+              TextButton(
                 onPressed: () {
                   // Navegar de regreso a la página de inicio de sesión
-                    Navigator.push(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const LoginPage(title: 'Login'),
+                      builder: (context) => const LoginPage(title: 'Login'),
                     ),
-                    );
+                  );
                 },
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.blue, // Color del fondo del botón
+                 style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 10), // Padding horizontal de 10px
                 ),
-                child: Text('Regresar', style: TextStyle(color: Colors.white), 
+                child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Regresar a inicio de sesión',
+                    style: TextStyle(color: Color(0xFF003785)), // Color azul
+                  ),
                 ),
-                ),
+              ),
             ],
-            ),
+          ),
         ),
-        ),
+      ),
     );
-    }
+  }
 }
