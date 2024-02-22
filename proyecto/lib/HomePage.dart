@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Categories.dart';
 import 'Recommendations.dart';
-import 'Services.dart';
+import 'Service.dart';
 import 'Specialist.dart';
 import 'Specialities.dart';
 import 'Users.dart';
@@ -234,7 +234,7 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const SpecialistPage(title: 'Specialist')),
+                                MaterialPageRoute(builder: (context) => const ServicePage(title: 'Servicios')),
                               );
                             },
                             child: Container(
