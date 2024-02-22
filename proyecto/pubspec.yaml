@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.3
+  url_launcher: ^6.0.13
     
     
 
@@ -64,6 +65,8 @@ flutter:
 
 assets:
     - assets/servicios.jpg
+    - assets/userplaceholder.jpg
+
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

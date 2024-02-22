@@ -1,64 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:proyecto/models/Specialist.dart';
 import 'package:proyecto/models/Category.dart';
 import 'package:proyecto/models/Service.dart';
-import 'ServicesPage.dart';
 import 'package:proyecto/models/User.dart';
-import 'dart:convert';
+import 'ServicesPage.dart';
 
-Future<List<Service>> fetchServices() async {
-  final response =
-      await http.get(Uri.parse('http://127.0.0.1:8000/api/services'));
-
-  if (response.statusCode == 200) {
-    Iterable jsonResponse = jsonDecode(response.body);
-    List<Service> services = jsonResponse
-        .map((data) => Service.fromJson(data))
-        .toList();
-    return services;
-  } else {
-    throw Exception('Failed to load Services');
-  }
-}
-
-Future<Category> fetchCategory(int categoryId) async {
-  final response = await http.get(
-      Uri.parse('http://127.0.0.1:8000/api/categories/$categoryId'));
-
-  if (response.statusCode == 200) {
-    Map<String, dynamic> categoryData = jsonDecode(response.body);
-    return Category.fromJson(categoryData);
-  } else {
-    throw Exception('Failed to load category');
-  }
-}
-
-Future<List<Specialist>> fetchSpecialists() async {
-  final response =
-      await http.get(Uri.parse('http://127.0.0.1:8000/api/specialists'));
-
-  if (response.statusCode == 200) {
-    Iterable jsonResponse = jsonDecode(response.body);
-    List<Specialist> Specialists =
-        jsonResponse.map((data) => Specialist.fromJson(data)).toList();
-    return Specialists;
-  } else {
-    throw Exception('Failed to load Specialists');
-  }
-}
-
-Future<User> fetchUser(int userId) async {
-  final response =
-      await http.get(Uri.parse('http://127.0.0.1:8000/api/users/$userId'));
-
-  if (response.statusCode == 200) {
-    Map<String, dynamic> userData = jsonDecode(response.body);
-    return User.fromJson(userData);
-  } else {
-    throw Exception('Failed to load user');
-  }
-}
 
 class ServicePage extends StatefulWidget {
   const ServicePage({Key? key, required this.title}) : super(key: key);
@@ -75,6 +23,32 @@ class _ServicePageState extends State<ServicePage> {
   void initState() {
     super.initState();
     futureServices = fetchServices();
+  }
+
+  Future<List<Service>> fetchServices() async {
+    final response =
+        await http.get(Uri.parse('http://127.0.0.1:8000/api/services'));
+
+    if (response.statusCode == 200) {
+      Iterable jsonResponse = jsonDecode(response.body);
+      List<Service> services =
+          jsonResponse.map((data) => Service.fromJson(data)).toList();
+      return services;
+    } else {
+      throw Exception('Failed to load Services');
+    }
+  }
+
+  Future<User> fetchUser(int userId) async {
+    final response =
+        await http.get(Uri.parse('http://127.0.0.1:8000/api/users/$userId'));
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> userData = jsonDecode(response.body);
+      return User.fromJson(userData);
+    } else {
+      throw Exception('Failed to load user');
+    }
   }
 
   @override
@@ -103,7 +77,7 @@ class _ServicePageState extends State<ServicePage> {
             itemBuilder: (context, index) {
               Service service = snapshot.data![index];
               return InkWell(
-                onTap: () {
+                onTap: () async {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -203,31 +177,4 @@ class _ServicePageState extends State<ServicePage> {
       ),
     );
   }
-}
-
-class ServicesPage extends StatelessWidget {
-  final int serviceId;
-
-  const ServicesPage({Key? key, required this.serviceId}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Aquí puedes implementar la lógica para cargar los detalles del servicio usando serviceId.
-    // Puedes usar FutureBuilder o cualquier otro método según tus necesidades.
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Detalles del Servicio'),
-      ),
-      body: Center(
-        child: Text('Detalles del Servicio ID: $serviceId'),
-      ),
-    );
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    title: 'Service Page',
-    home: ServicePage(title: 'Service Page'),
-  ));
 }
