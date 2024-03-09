@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'HomePage.dart';
 import 'Login.dart';
 
@@ -18,12 +20,39 @@ class _RegisterPageState extends State<RegisterPage> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
+  // Método para mostrar el AlertDialog
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Registro Exitoso'),
+          content: Text('Tu cuenta ha sido registrada correctamente.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el AlertDialog
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginPage(title: 'Login'),
+                  ),
+                );
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Color(0xFF003785), // Color del fondo (azul)
+        backgroundColor: Color(0xFF003785),
         title: Text(
           widget.title,
           style: TextStyle(color: Colors.white),
@@ -33,29 +62,29 @@ class _RegisterPageState extends State<RegisterPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start, 
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-                Text(
+              Text(
                 'Crea una cuenta',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black, // Color del texto (blanco)
+                  color: Colors.black,
                 ),
               ),
-            SizedBox(height: 20),
+              SizedBox(height: 20),
               // Campos de entrada para el registro
               TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
-                  labelText: 'Nombre Completo',
+                  labelText: 'Nombre',
                 ),
               ),
               TextFormField(
                 controller: usernameController,
                 decoration: InputDecoration(
-                  labelText: 'Usuario',
+                  labelText: 'Apellido',
                 ),
               ),
               TextFormField(
@@ -79,7 +108,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Validar que no haya campos vacíos
                   if (nameController.text.isEmpty ||
                       usernameController.text.isEmpty ||
@@ -94,22 +123,45 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     );
                   } else {
-                    // Permitir la creación de la cuenta
-                    // Aquí puedes agregar lógica adicional según tus necesidades
-                    // En este ejemplo, simplemente navega a la página de inicio
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePage(title: 'Inicio'),
-                      ),
+                    // Crear un mapa con los datos del usuario
+                    Map<String, dynamic> userData = {
+                      'name': nameController.text,
+                      'surname': usernameController.text,
+                      'email': emailController.text,
+                      'phone': phoneController.text,
+                      'password': passwordController.text,
+                    };
+
+                    // Convertir el mapa a JSON
+                    String jsonData = jsonEncode(userData);
+
+                    // Enviar los datos a la API
+                    final response = await http.post(
+                      Uri.parse('http://127.0.0.1:8000/api/users/create'),
+                      headers: {'Content-Type': 'application/json'},
+                      body: jsonData,
                     );
+
+                    // Analizar la respuesta
+                    if (response.statusCode == 200) {
+                      // Registro exitoso, mostrar el AlertDialog
+                      _showSuccessDialog();
+                    } else {
+                      // Mostrar un mensaje de error si algo salió mal
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error en el registro. Por favor, intenta de nuevo.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
                 },
-               style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Color(0xFF003785)), // Color del fondo del botón (azul)
-                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 20)), // Padding horizontal de 10px
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Color(0xFF003785)),
+                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 20)),
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30), // Establecer el border radius a 30px
+                    borderRadius: BorderRadius.circular(30),
                   )),
                 ),
                 child: Container(
@@ -117,7 +169,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   alignment: Alignment.center,
                   child: Text(
                     'Registrarme',
-                    style: TextStyle(color: Colors.white), // Color del texto del botón (blanco)
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -132,15 +184,15 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   );
                 },
-                 style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 10), // Padding horizontal de 10px
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
                 ),
                 child: Container(
                   width: double.infinity,
                   alignment: Alignment.center,
                   child: Text(
                     'Regresar a inicio de sesión',
-                    style: TextStyle(color: Color(0xFF003785)), // Color azul
+                    style: TextStyle(color: Color(0xFF003785)),
                   ),
                 ),
               ),

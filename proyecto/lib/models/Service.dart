@@ -9,9 +9,6 @@ class Service {
   final int ID_Especialista;
   final int ID_Usuario;
 
- 
-
-
   const Service({
     required this.id,
     required this.Nombre,
@@ -21,7 +18,6 @@ class Service {
     required this.Disponibilidad,
     required this.ID_Especialista,
     required this.ID_Usuario,
-
   });
 
   factory Service.fromJson(Map<String, dynamic> json) {
@@ -35,8 +31,6 @@ class Service {
         'Disponibilidad': String Disponibilidad,
         'ID_Especialista': int ID_Especialista,
         'ID_Usuario': int ID_Usuario,
-
-
       } =>
         Service(
           id: id,
@@ -47,9 +41,8 @@ class Service {
           Disponibilidad: Disponibilidad,
           ID_Especialista: ID_Especialista,
           ID_Usuario: ID_Usuario,
-
         ),
-      _ => throw const FormatException('Failed to load album.'),
+      _ => throw const FormatException('Failed to load service.'),
     };
   }
 }

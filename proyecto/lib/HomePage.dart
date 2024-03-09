@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'Categories.dart';
-import 'Recommendations.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'Service.dart';
-import 'Specialist.dart';
-import 'Specialities.dart';
-import 'Users.dart';
+import 'ServicesPage.dart';
+import 'Perfil.dart';
+import 'CategoriesPage.dart';
+import 'package:proyecto/models/Specialist.dart';
+import 'package:proyecto/models/Category.dart';
+import 'package:proyecto/models/User.dart';
+import 'package:proyecto/models/Service.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -16,6 +21,57 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0; // Índice de la página seleccionada
+  List<Category> categories = [];
+  late Future<List<Service>> futureServices;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+    futureServices = _fetchServices();
+  }
+
+   Future<User> _fetchUser(int userId) async {
+  final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/users/$userId'));
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> userData = jsonDecode(response.body);
+    return User.fromJson(userData);
+  } else {
+    print('Error al cargar datos del usuario. Código de estado: ${response.statusCode}');
+    print('Respuesta: ${response.body}');
+    throw Exception('Failed to load user');
+  }
+}
+
+  Future<void> _fetchCategories() async {
+    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/categories'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> categoryData = jsonDecode(response.body);
+      List<Category> fetchedCategories = categoryData.map((data) => Category.fromJson(data)).toList();
+
+      setState(() {
+        categories = fetchedCategories;
+      });
+    } else {
+      print('Error al cargar las categorías.');
+    }
+  }
+
+  Future<List<Service>> _fetchServices() async {
+    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/services'));
+
+    if (response.statusCode == 200) {
+      Iterable jsonResponse = jsonDecode(response.body);
+      List<Service> services = jsonResponse.map((data) => Service.fromJson(data)).toList();
+      return services;
+    } else {
+      throw Exception('Failed to load Services');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,95 +168,67 @@ class _HomePageState extends State<HomePage> {
               height: 20,
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 100,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.cake, color: Colors.white, size: 30),
-                        SizedBox(height: 8),
-                        Text(
-                          'Repostería',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                          textAlign: TextAlign.center,
+              padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+              child: CarouselSlider.builder(
+                options: CarouselOptions(
+                  height: 160.0,
+                  enlargeCenterPage: false,
+                  enableInfiniteScroll: true,
+                  viewportFraction: 0.33,
+                  aspectRatio: 16 / 9,
+                  onPageChanged: (index, reason) {},
+                ),
+                itemCount: categories.length,
+                itemBuilder: (context, index, realIndex) {
+                  Category category = categories[index];
+                  return GestureDetector(
+                    onTap: () {
+                      // Navegar a CategoriesPage y pasar el ID de la categoría
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CategoriesPage(categoryId: category.id),
                         ),
-                      ],
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      margin: EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            height: 120.0, // Ajusta la altura deseada
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage('servicios.jpg'), // Ajusta la ruta de la imagen
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              category.Nombre,
+                              style: TextStyle(color: Colors.black, fontSize: 14),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    width: 100,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.build, color: Colors.white, size: 30),
-                        SizedBox(height: 8),
-                        Text(
-                          'Plomeros',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 100,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.car_rental, color: Colors.white, size: 30),
-                        SizedBox(height: 8),
-                        Text(
-                          'Alquiler de Autos',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 100,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.medical_services, color: Colors.white, size: 30),
-                        SizedBox(height: 8),
-                        Text(
-                          'Servicios Médicos',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
             SizedBox(height: 20),
@@ -226,91 +254,125 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: ListView(
-                        padding: const EdgeInsets.fromLTRB(16.0, 15.0, 16.0, 0),
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ServicePage(title: 'Servicios')),
-                              );
-                            },
-                            child: Container(
-                              width: 120,
-                              margin: EdgeInsets.only(bottom: 15.0),
-                              decoration: BoxDecoration(
-                                color: Color(0xFFF5F5F5), // Utilizando el color #eaeaea
-                                borderRadius: BorderRadius.all(Radius.circular(20)),
+                    FutureBuilder<List<Service>>(
+                      future: futureServices,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('${snapshot.error}');
+                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return Text('No hay datos disponibles');
+                        }
+
+                        return Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(16.0, 15.0, 16.0, 0),
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              Service service = snapshot.data![index];
+return InkWell(
+  onTap: () async {
+    // Navegar a la página de detalles del servicio
+    // Puedes implementar esto según tus necesidades
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ServicesPage(serviceId: service.ID),
+      ),
+    );
+  },
+  child: Container(
+    width: double.infinity,
+    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    decoration: BoxDecoration(
+      color: Color(0xFFF5F5F5),
+      borderRadius: BorderRadius.all(Radius.circular(20)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+         child: Image.asset(
+                                'servicios.jpg',
+                                width: double.infinity,
+                                height: 150,
+                                fit: BoxFit.cover,
                               ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                    ),
-                                    child: Image.asset(
-                                      'servicios.jpg', // Reemplaza con la ruta real de tu imagen
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Jose Guillermo Iñiguez',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                            Text(
-                                              'Madiffy',
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Especialista en reposteria',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Disponible',
-                                          style: TextStyle(
-                                            color: Colors.green[300],
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${service.Nombre}',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  FutureBuilder<User>(
+                    future: _fetchUser(service.ID_Usuario),
+                    builder: (context, userSnapshot) {
+                      if (userSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (userSnapshot.hasError) {
+                        return Text('${userSnapshot.error}');
+                      } else {
+                        return Text(
+                          '${userSnapshot.data!.Nombre} ${userSnapshot.data!.Apellido}',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
                           ),
-                          // Agrega más elementos según sea necesario...
-                        ],
-                      ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${service.Descripcion}',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${service.Disponibilidad}',
+                style: TextStyle(
+                  color: service.Disponibilidad == 'Fuera de servicio'
+                      ? Colors.red[400]
+                      : Colors.green[300],
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  ),
+);
+
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -319,6 +381,53 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+      // Agregar BottomNavigationBar
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Inicio',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Buscar',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue[600],
+        onTap: _onItemTapped,
+      ),
     );
   }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    // Navegar a la página correspondiente según el índice seleccionado
+    switch (_selectedIndex) {
+      case 0:
+        // Página de inicio
+        break;
+      case 1:
+        // Página de búsqueda
+        // Puedes implementar la navegación según tus necesidades
+        break;
+      case 2:
+        // Página de perfil
+         Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PerfilPage()),
+      );
+        break;
+    }
+  }
+
+ 
+
 }
