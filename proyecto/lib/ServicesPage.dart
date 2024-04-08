@@ -1,19 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'pedido.dart'; // Importa tu archivo Pedido.dart
+import 'package:intl/intl.dart';
 import 'package:proyecto/models/Service.dart';
 import 'package:proyecto/models/User.dart';
 import 'package:proyecto/models/Specialist.dart';
 import 'package:proyecto/models/Recommendation.dart';
-import 'pedido.dart'; // Importa tu archivo Pedido.dart
 
-class ServicesPage extends StatelessWidget {
+class ServicesPage extends StatefulWidget {
   final int serviceId;
 
   const ServicesPage({Key? key, required this.serviceId}) : super(key: key);
 
+  @override
+  _ServicesPageState createState() => _ServicesPageState();
+}
+
+class _ServicesPageState extends State<ServicesPage> {
+  late SharedPreferences _prefs;
+  late String _accessToken;
+  late Map<String, dynamic>? _profileData; // Cambio aquí, agregué un signo de interrogación para indicar que puede ser nulo
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSessionData();
+  }
+
+   Future<void> _loadSessionData() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _accessToken = _prefs.getString('accessToken') ?? '';
+      _profileData = jsonDecode(_prefs.getString('profile') ?? '{}');
+    });
+  }
+
+  
+
   Future<Service> fetchService(int id) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/services/$id'));
+    final response =
+        await http.get(Uri.parse('https://conectapro.madiffy.com/api/services/$id'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> serviceData = jsonDecode(response.body);
@@ -24,7 +52,8 @@ class ServicesPage extends StatelessWidget {
   }
 
   Future<User> fetchUser(int userId) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/users/$userId'));
+    final response =
+        await http.get(Uri.parse('https://conectapro.madiffy.com/api/users/$userId'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> userData = jsonDecode(response.body);
@@ -35,7 +64,8 @@ class ServicesPage extends StatelessWidget {
   }
 
   Future<Specialist> fetchSpecialist(int specialistId) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/specialists/$specialistId'));
+    final response = await http
+        .get(Uri.parse('https://conectapro.madiffy.com/api/specialists/$specialistId'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> specialistData = jsonDecode(response.body);
@@ -46,7 +76,8 @@ class ServicesPage extends StatelessWidget {
   }
 
   Future<List<Recommendation>> fetchRecommendations(int serviceId) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/recommendations'));
+    final response =
+        await http.get(Uri.parse('https://conectapro.madiffy.com/api/recommendations'));
 
     if (response.statusCode == 200) {
       List<dynamic> responseData = jsonDecode(response.body);
@@ -79,15 +110,36 @@ class ServicesPage extends StatelessWidget {
           size: 20,
         ),
       ) +
-      [
-        if (remainder > 0)
-          Icon(
-            Icons.star_half,
-            color: Colors.amber,
-            size: 20,
-          ),
-      ],
+          [
+            if (remainder > 0)
+              Icon(
+                Icons.star_half,
+                color: Colors.amber,
+                size: 20,
+              ),
+          ],
     );
+  }
+
+  String _wrapDescription(String text, int maxLineLength) {
+    List<String> words = text.split(' ');
+    List<String> lines = [];
+
+    String currentLine = '';
+    for (String word in words) {
+      if ((currentLine.length + word.length) > maxLineLength) {
+        lines.add(currentLine);
+        currentLine = word + ' ';
+      } else {
+        currentLine += word + ' ';
+      }
+    }
+
+    if (currentLine.isNotEmpty) {
+      lines.add(currentLine);
+    }
+
+    return lines.join('\n');
   }
 
   @override
@@ -101,7 +153,7 @@ class ServicesPage extends StatelessWidget {
         ),
       ),
       body: FutureBuilder<Service>(
-        future: fetchService(serviceId),
+        future: fetchService(widget.serviceId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -117,8 +169,8 @@ class ServicesPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 ClipRRect(
-                  child: Image.asset(
-                    'servicios.jpg',
+                  child: Image.network(
+                    'https://conectapro.madiffy.com/assets/services/${selectedService.Imagen}',
                     width: double.infinity,
                     height: 250,
                     fit: BoxFit.cover,
@@ -173,15 +225,21 @@ class ServicesPage extends StatelessWidget {
                                 const SizedBox(height: 8),
                                 ElevatedButton.icon(
   onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PedidoPage(
-          serviceName: selectedService.Nombre,
-          specialistName: '${user.Nombre} ${user.Apellido}',
+    if (_accessToken.isEmpty) {
+      _showLoginNotification();
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PedidoPage(
+            serviceId: selectedService.ID, // Pasa el ID del servicio
+            specialistId: selectedService.ID_Especialista, // Pasa el ID del especialista
+            serviceName: selectedService.Nombre,
+            specialistName: '${user.Nombre} ${user.Apellido}',
+          ),
         ),
-      ),
-    );
+      );
+    }
   },
   icon: Icon(
     Icons.phone,
@@ -206,6 +264,7 @@ class ServicesPage extends StatelessWidget {
     ),
   ),
 ),
+
                                 const SizedBox(height: 30),
                                 Row(
                                   children: [
@@ -227,7 +286,7 @@ class ServicesPage extends StatelessWidget {
                                               ),
                                             ),
                                             FutureBuilder<List<Recommendation>>(
-                                              future: fetchRecommendations(serviceId),
+                                              future: fetchRecommendations(widget.serviceId),
                                               builder: (context, recommendationSnapshot) {
                                                 if (recommendationSnapshot.connectionState ==
                                                     ConnectionState.waiting) {
@@ -240,14 +299,11 @@ class ServicesPage extends StatelessWidget {
                                                 }
 
                                                 double averageRating = 0.0;
-                                                for (Recommendation recommendation
-                                                    in recommendationSnapshot.data!) {
-                                                  averageRating +=
-                                                      double.parse(recommendation.Calificacion);
+                                                for (Recommendation recommendation in recommendationSnapshot.data!) {
+                                                  averageRating += recommendation.Calificacion;
                                                 }
                                                 if (recommendationSnapshot.data!.isNotEmpty) {
-                                                  averageRating /=
-                                                      recommendationSnapshot.data!.length;
+                                                  averageRating /= recommendationSnapshot.data!.length;
                                                 }
 
                                                 return Column(
@@ -299,7 +355,7 @@ class ServicesPage extends StatelessWidget {
                                                   ),
                                                 ),
                                                 Text(
-                                                  ' ${specialist.Descripcion}',
+                                                  ' ${_wrapDescription(specialist.Descripcion, 55)}',
                                                   style: TextStyle(
                                                     color: Colors.black,
                                                     fontSize: 14,
@@ -323,7 +379,7 @@ class ServicesPage extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 15),
                                 FutureBuilder<List<Recommendation>>(
-                                  future: fetchRecommendations(serviceId),
+                                  future: fetchRecommendations(widget.serviceId),
                                   builder: (context, recommendationSnapshot) {
                                     if (recommendationSnapshot.connectionState ==
                                         ConnectionState.waiting) {
@@ -379,7 +435,7 @@ class ServicesPage extends StatelessWidget {
                                                       },
                                                     ),
                                                     const SizedBox(height: 4),
-                                                    _buildStarRating(double.parse(recommendation.Calificacion)),
+                                                    _buildStarRating(recommendation.Calificacion),
                                                     const SizedBox(height: 4),
                                                     Text(
                                                       'Comentario: ${recommendation.Comentario}',
@@ -413,4 +469,14 @@ class ServicesPage extends StatelessWidget {
       ),
     );
   }
+
+  void _showLoginNotification() {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Necesitas iniciar sesión para contratar un servicio.'),
+      duration: Duration(seconds: 3),
+    ),
+  );
+}
+
 }

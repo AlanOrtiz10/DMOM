@@ -1,10 +1,10 @@
 class Recommendation {
   final int id;
   final int ID_Usuario;
-  final int ID_Especialista;
+  final Map<String, dynamic> ID_Especialista;
   final String Comentario;
   final int ID_Servicio;
-  final dynamic Calificacion; // Cambié el tipo a dynamic
+  final double Calificacion;
 
   Recommendation({
     required this.id,
@@ -13,18 +13,16 @@ class Recommendation {
     required this.Comentario,
     required this.Calificacion,
     required this.ID_Servicio,
-
   });
 
   factory Recommendation.fromJson(Map<String, dynamic> json) {
     return Recommendation(
       id: json['id'],
-      ID_Usuario: json['ID_Usuario'],
+      ID_Usuario: json['ID_Usuario']['id'],
       ID_Especialista: json['ID_Especialista'],
       Comentario: json['Comentario'],
-      Calificacion: json['Calificacion'], // Mantén la calificación como está en el JSON
-      ID_Servicio: json['ID_Servicio'],
-
+      Calificacion: double.parse(json['Calificacion']),
+      ID_Servicio: json['ID_Servicio']['id'],
     );
   }
 }

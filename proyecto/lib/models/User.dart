@@ -4,7 +4,7 @@ class User {
   final String Apellido;
   final String Telefono;
   final String Email;
-  final String Password;
+
 
   const User({
     required this.id,
@@ -12,33 +12,19 @@ class User {
     required this.Apellido,
     required this.Telefono,
     required this.Email,
-    required this.Password,
+  
 
 
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'Nombre': String Nombre,
-        'Apellido': String Apellido,
-        'Telefono': String Telefono,
-        'Email': String Email,
-        'Password': String Password,
+  return User(
+    id: json['id'],
+    Nombre: json['Nombre'],
+    Apellido: json['Apellido'],
+    Telefono: json['Telefono'],
+    Email: json['Email'],
+  );
+}
 
-
-      } =>
-          User(
-            id: id,
-            Nombre: Nombre,
-            Apellido: Apellido,
-            Telefono: Telefono,
-            Email: Email,
-            Password: Password,
-
-          ),
-      _ => throw const FormatException('Failed to load User.'),
-    };
-  }
 }

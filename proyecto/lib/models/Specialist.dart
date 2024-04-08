@@ -1,37 +1,35 @@
 class Specialist {
-  final int ID_Usuario;
+  final int id;
   final String Descripcion;
-  final int ID_Categoria;
   final String Imagen;
+  final int ID_Usuario;
+  final String ID_Categoria;
+  final String ID_Especialidades;
 
 
-  const Specialist({
-    required this.ID_Usuario,
+
+  Specialist({
+    required this.id,
     required this.Descripcion,
-    required this.ID_Categoria,
     required this.Imagen,
+    required this.ID_Usuario,
+    required this.ID_Categoria,
+    required this.ID_Especialidades,
+
 
   });
 
   factory Specialist.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'ID_Usuario': int ID_Usuario,
-        'Descripcion': String Descripcion,
-        'ID_Categoria': int ID_Categoria,
-        'Imagen': String Imagen,
-
-
-
-      } =>
-        Specialist(
-          ID_Usuario: ID_Usuario,
-          Descripcion: Descripcion,
-          ID_Categoria: ID_Categoria,
-          Imagen: Imagen,
-
-        ),
-      _ => throw const FormatException('Failed to load album.'),
-    };
-  }
+  return Specialist(
+    id: json['id'],
+    Descripcion: json['Descripcion'],
+    Imagen: json['Imagen'],
+    ID_Usuario: json['ID_Usuario']['id'],
+    ID_Categoria: json['ID_Categoria'],
+    ID_Especialidades: json['ID_Especialidades'],
+  );
 }
+
+}
+
+

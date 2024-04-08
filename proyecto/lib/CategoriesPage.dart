@@ -27,25 +27,35 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Future<Category> fetchCategory(int categoryId) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/categories/$categoryId'));
+    try {
+      final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/categories/$categoryId'));
 
-    if (response.statusCode == 200) {
-      Map<String, dynamic> categoryData = jsonDecode(response.body);
-      return Category.fromJson(categoryData);
-    } else {
-      throw Exception('Failed to load category');
+      if (response.statusCode == 200) {
+        Map<String, dynamic> categoryData = jsonDecode(response.body);
+        return Category.fromJson(categoryData);
+      } else {
+        throw Exception('Failed to load category. Status Code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching category: $error');
+      throw error;
     }
   }
 
   Future<List<Service>> fetchServices() async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/services/'));
+    try {
+      final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/services'));
 
-    if (response.statusCode == 200) {
-      Iterable jsonResponse = jsonDecode(response.body);
-      List<Service> services = jsonResponse.map((data) => Service.fromJson(data)).toList();
-      return services;
-    } else {
-      throw Exception('Failed to load services');
+      if (response.statusCode == 200) {
+        Iterable jsonResponse = jsonDecode(response.body);
+        List<Service> services = jsonResponse.map((data) => Service.fromJson(data)).toList();
+        return services;
+      } else {
+        throw Exception('Failed to load services. Status Code: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching services: $error');
+      throw error;
     }
   }
 
@@ -54,7 +64,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue[800],
-        title: Text('Servicios por categoria',
+        title: Text(
+          'Servicios por categoría',
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -72,20 +83,12 @@ class _CategoriesPageState extends State<CategoriesPage> {
           Category category = snapshot.data![0];
           List<Service> allServices = snapshot.data![1];
 
-          // Filtrar servicios por categoría seleccionada
-          List<Service> services = allServices.where((service) => service.ID_Categoria == widget.categoryId).toList();
+          List<Service> services =
+              allServices.where((service) => service.ID_Categoria == widget.categoryId).toList();
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.network(
-  'http://127.0.0.1:8000/assets/services/placeholder.jpg',
-  width: double.infinity,
-  height: 150,
-  fit: BoxFit.cover,
-),
-
-
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -109,11 +112,10 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     Service service = services[index];
                     return InkWell(
                       onTap: () async {
-                        // Navegar a la página de detalles del servicio
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ServicesPage(serviceId: service.ID),
+                           builder: (context) => ServicesPage(serviceId: service.id),
                           ),
                         );
                       },
@@ -131,8 +133,8 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                 topLeft: Radius.circular(20),
                                 topRight: Radius.circular(20),
                               ),
-                              child: Image.asset(
-                                'servicios.jpg',
+                              child: Image.network(
+                                service.imageUrl,
                                 width: double.infinity,
                                 height: 150,
                                 fit: BoxFit.cover,
@@ -189,8 +191,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  
-                                  
                                 ],
                               ),
                             ),
@@ -209,7 +209,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Future<User> _fetchUser(int userId) async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/users/$userId'));
+    final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/users/$userId'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> userData = jsonDecode(response.body);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'HomePage.dart';
 import 'Login.dart';
 
@@ -15,36 +16,68 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   TextEditingController nameController = TextEditingController();
-  TextEditingController usernameController = TextEditingController();
+  TextEditingController surnameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
-  // Método para mostrar el AlertDialog
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Registro Exitoso'),
-          content: Text('Tu cuenta ha sido registrada correctamente.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el AlertDialog
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginPage(title: 'Login'),
-                  ),
-                );
-              },
-              child: Text('OK'),
-            ),
-          ],
+  Future<void> _register() async {
+    try {
+      final response = await http.post(
+        Uri.parse('https://conectapro.madiffy.com/api/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': nameController.text,
+          'surname': surnameController.text,
+          'email': emailController.text,
+          'phone': phoneController.text,
+          'password': passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+       if (responseData['message'] == 'success') {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('accessToken', responseData['access_token']);
+  prefs.setString('profile', jsonEncode(responseData['profile'])); // Guardar datos del perfil del usuario
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Registro exitoso'),
+      backgroundColor: Colors.green,
+    ),
+  );
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const HomePage(title: "ConectaPro"),
+    ),
+  );
+} else {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('Error en el registro. Por favor, intenta de nuevo.'),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
+
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error en el registro. Por favor, intenta de nuevo.'),
+            backgroundColor: Colors.red,
+          ),
         );
-      },
-    );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error en el registro. Por favor, intenta de nuevo.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -74,7 +107,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               SizedBox(height: 20),
-              // Campos de entrada para el registro
               TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
@@ -82,7 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               TextFormField(
-                controller: usernameController,
+                controller: surnameController,
                 decoration: InputDecoration(
                   labelText: 'Apellido',
                 ),
@@ -108,55 +140,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () async {
-                  // Validar que no haya campos vacíos
-                  if (nameController.text.isEmpty ||
-                      usernameController.text.isEmpty ||
-                      emailController.text.isEmpty ||
-                      passwordController.text.isEmpty ||
-                      phoneController.text.isEmpty) {
-                    // Mostrar un mensaje de error si hay campos vacíos
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Por favor, completa todos los campos.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  } else {
-                    // Crear un mapa con los datos del usuario
-                    Map<String, dynamic> userData = {
-                      'name': nameController.text,
-                      'surname': usernameController.text,
-                      'email': emailController.text,
-                      'phone': phoneController.text,
-                      'password': passwordController.text,
-                    };
-
-                    // Convertir el mapa a JSON
-                    String jsonData = jsonEncode(userData);
-
-                    // Enviar los datos a la API
-                    final response = await http.post(
-                      Uri.parse('http://127.0.0.1:8000/api/users/create'),
-                      headers: {'Content-Type': 'application/json'},
-                      body: jsonData,
-                    );
-
-                    // Analizar la respuesta
-                    if (response.statusCode == 200) {
-                      // Registro exitoso, mostrar el AlertDialog
-                      _showSuccessDialog();
-                    } else {
-                      // Mostrar un mensaje de error si algo salió mal
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Error en el registro. Por favor, intenta de nuevo.'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  }
-                },
+                onPressed: _register,
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Color(0xFF003785)),
                   padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 20)),
@@ -176,7 +160,6 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(height: 16),
               TextButton(
                 onPressed: () {
-                  // Navegar de regreso a la página de inicio de sesión
                   Navigator.push(
                     context,
                     MaterialPageRoute(

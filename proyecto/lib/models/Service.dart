@@ -21,28 +21,18 @@ class Service {
   });
 
   factory Service.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'Nombre': String Nombre,
-        'Descripcion': String Descripcion,
-        'ID_Categoria': int ID_Categoria,
-        'Imagen': String Imagen,
-        'Disponibilidad': String Disponibilidad,
-        'ID_Especialista': int ID_Especialista,
-        'ID_Usuario': int ID_Usuario,
-      } =>
-        Service(
-          id: id,
-          Nombre: Nombre,
-          Descripcion: Descripcion,
-          ID_Categoria: ID_Categoria,
-          Imagen: Imagen,
-          Disponibilidad: Disponibilidad,
-          ID_Especialista: ID_Especialista,
-          ID_Usuario: ID_Usuario,
-        ),
-      _ => throw const FormatException('Failed to load service.'),
-    };
-  }
+  return Service(
+    id: json['id'],
+    Nombre: json['Nombre'],
+    Descripcion: json['Descripcion'],
+    ID_Categoria: json['ID_Categoria']['id'], // Accede al campo 'id' dentro del objeto 'ID_Categoria'
+    Imagen: json['Imagen'],
+    Disponibilidad: json['Disponibilidad'],
+    ID_Especialista: json['ID_Especialista']['id'], // Accede al campo 'id' dentro del objeto 'ID_Especialista'
+    ID_Usuario: json['ID_Usuario'], // Esto es un valor entero
+  );
+}
+
+
+  String get imageUrl => 'https://conectapro.madiffy.com/assets/services/$Imagen';
 }

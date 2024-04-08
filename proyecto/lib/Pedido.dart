@@ -1,20 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'HomePage.dart';
+import 'Orders.dart';
 
 class PedidoPage extends StatefulWidget {
+  final int serviceId;
+  final int specialistId;
   final String serviceName;
   final String specialistName;
 
-  PedidoPage({Key? key, required this.serviceName, required this.specialistName}) : super(key: key);
+  PedidoPage({
+    Key? key,
+    required this.serviceId,
+    required this.specialistId,
+    required this.serviceName,
+    required this.specialistName,
+  }) : super(key: key);
 
   @override
   _PedidoPageState createState() => _PedidoPageState();
 }
 
 class _PedidoPageState extends State<PedidoPage> {
+  late SharedPreferences _prefs;
+  late String _accessToken;
+  late Map<String, dynamic>? _profileData;
   TextEditingController nombreController = TextEditingController();
   TextEditingController telefonoController = TextEditingController();
   TextEditingController correoController = TextEditingController();
   TextEditingController detallesController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSessionData();
+  }
+
+  Future<void> _loadSessionData() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _accessToken = _prefs.getString('accessToken') ?? '';
+      _profileData = jsonDecode(_prefs.getString('profile') ?? '{}');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,20 +63,11 @@ class _PedidoPageState extends State<PedidoPage> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            Text(
-              'Nombre del servicio: ${widget.serviceName}',
-              style: TextStyle(fontSize: 16),
-            ),
+            Text('Nombre del servicio: ${widget.serviceName}', style: TextStyle(fontSize: 16)),
             const SizedBox(height: 10),
-            Text(
-              'Nombre del especialista: ${widget.specialistName}',
-              style: TextStyle(fontSize: 16),
-            ),
+            Text('Nombre del especialista: ${widget.specialistName}', style: TextStyle(fontSize: 16)),
             const SizedBox(height: 20),
-            Text(
-              'Datos de contacto',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
+            Text('Datos de contacto', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             TextFormField(
               controller: nombreController,
@@ -65,15 +86,14 @@ class _PedidoPageState extends State<PedidoPage> {
             const SizedBox(height: 10),
             TextFormField(
               controller: detallesController,
-              maxLines: 3, // Permite múltiples líneas para detalles adicionales
+              maxLines: 3,
               decoration: InputDecoration(labelText: 'Detalles adicionales'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Validar si todos los campos están completos antes de mostrar el AlertDialog
                 if (_camposCompletos()) {
-                  _mostrarDialogo(context);
+                  _enviarPedido();
                 } else {
                   _mostrarMensajeError(context);
                 }
@@ -100,8 +120,32 @@ class _PedidoPageState extends State<PedidoPage> {
     );
   }
 
-  Future<void> _mostrarDialogo(BuildContext context) async {
-    return showDialog<void>(
+  Future<void> _enviarPedido() async {
+    final url = Uri.parse('https://conectapro.madiffy.com/api/orders/create');
+    final response = await http.post(
+      url,
+      body: {
+        'name': nombreController.text,
+        'phone': telefonoController.text,
+        'email': correoController.text,
+        'additional_details': detallesController.text,
+        'service_id': widget.serviceId.toString(),
+        'specialist_id': widget.specialistId.toString(),
+        'user_id': _profileData?['id'].toString() ?? '',
+        'order_status': 'pending',
+      },
+    );
+
+    if (response.statusCode == 201) {
+      _mostrarDialogo(context, 'Pedido recibido',
+          'El pedido se envió con éxito. Pronto el especialista se pondrá en contacto para revisar tu solicitud.');
+    } else {
+      _mostrarDialogo(context, 'Error', 'Hubo un error al enviar el pedido. Por favor, inténtalo de nuevo.');
+    }
+  }
+
+  Future<void> _mostrarDialogo(BuildContext context, String titulo, String mensaje) async {
+    showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -109,26 +153,30 @@ class _PedidoPageState extends State<PedidoPage> {
             child: Column(
               children: [
                 Icon(
-                  Icons.check_circle, // Icono de check
+                  Icons.check_circle,
                   color: Colors.green,
                   size: 60,
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  'Pedido recibido',
+                  titulo,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'El pedido se envió con éxito. Pronto el especialista se pondrá en contacto para revisar tu solicitud.',
+                  mensaje,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Cierra el AlertDialog
-                  },
+                Navigator.of(context).pop(); // Cierra el AlertDialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => OrdersPage()), // Reemplaza 'HomePage()' con la clase que representa tu página de inicio
+                );
+              },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Color(0xFF003785)),
                     padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 20, vertical: 15)),
@@ -137,7 +185,7 @@ class _PedidoPageState extends State<PedidoPage> {
                     )),
                   ),
                   child: Text(
-                    'Aceptar',
+                    'Ver mis pedidos',
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -150,7 +198,7 @@ class _PedidoPageState extends State<PedidoPage> {
   }
 
   Future<void> _mostrarMensajeError(BuildContext context) async {
-    return showDialog<void>(
+    showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -158,7 +206,7 @@ class _PedidoPageState extends State<PedidoPage> {
             child: Column(
               children: [
                 Icon(
-                  Icons.error, // Icono de error
+                  Icons.error,
                   color: Colors.red,
                   size: 60,
                 ),
@@ -176,7 +224,7 @@ class _PedidoPageState extends State<PedidoPage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop(); // Cierra el AlertDialog
+                    Navigator.of(context).pop();
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.red),
@@ -199,7 +247,6 @@ class _PedidoPageState extends State<PedidoPage> {
   }
 
   bool _camposCompletos() {
-    // Verificar que todos los campos estén completos
     return nombreController.text.isNotEmpty &&
         telefonoController.text.isNotEmpty &&
         correoController.text.isNotEmpty &&
