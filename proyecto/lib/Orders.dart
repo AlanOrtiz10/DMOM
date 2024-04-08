@@ -31,21 +31,21 @@ class Order {
     required this.updatedAt,
   });
 
-   factory Order.fromJson(Map<String, dynamic> json) {
-  return Order(
-    id: json['id'],
-    user: json['user'],
-    specialist: json['specialist'],
-    service: json['service'],
-    name: json['name'] ?? '',
-    phone: json['phone'] ?? '',
-    email: json['email'] ?? '',
-    additionalDetails: json['additional_details'] ?? '',
-    orderStatus: json['order_status'] ?? '',
-    createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
-    updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : DateTime.now(),
-  );
-}
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      id: json['id'],
+      user: json['user'],
+      specialist: json['specialist'],
+      service: json['service'],
+      name: json['name'] ?? '',
+      phone: json['phone'] ?? '',
+      email: json['email'] ?? '',
+      additionalDetails: json['additional_details'] ?? '',
+      orderStatus: json['order_status'] ?? '',
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : DateTime.now(),
+    );
+  }
 }
 
 class OrdersPage extends StatefulWidget {
@@ -114,6 +114,37 @@ class _OrdersPageState extends State<OrdersPage> {
       },
     );
   }
+
+ Future<void> _deleteOrder(int orderId) async {
+  final url = Uri.parse('https://ortiza.terrabyteco.com/api/orders/delete/$orderId');
+  final response = await http.delete(url, body: {'id': orderId.toString()});
+
+  if (response.statusCode == 200) {
+    // Actualizar la lista de pedidos después de eliminar el pedido
+    _fetchOrders();
+    // Mostrar una alerta notificando que se eliminó correctamente la orden
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Orden eliminada'),
+          content: Text('La orden ha sido eliminada correctamente.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Aceptar'),
+            ),
+          ],
+        );
+      },
+    );
+  } else {
+    throw Exception('Failed to delete order');
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -194,16 +225,25 @@ class _OrdersPageState extends State<OrdersPage> {
                                     ),
                                   ],
                                 ),
-                               
+                                
                               ],
                             ),
-                             SizedBox(height: 15),
-                             ElevatedButton(
+                          SizedBox(height: 15),
+
+                            ElevatedButton(
                                   onPressed: () {
                                     _showOrderDetails(order.additionalDetails);
                                   },
                                   child: Text('Ver detalles del pedido'),
                                 ),
+                                 SizedBox(height: 15),
+                                if (_profileData?['level_id'] != 3)
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      _deleteOrder(order.id);
+                                    },
+                                    child: Text('Eliminar pedido'),
+                                  ),
                           ],
                         ),
                       ),

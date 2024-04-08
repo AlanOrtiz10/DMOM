@@ -183,9 +183,10 @@ class _AccountPageState extends State<AccountPage> {
               TextFormField(
                 controller: _emailController,
               ),
-              Text(
-                '${_profileData?['access_token']}',
-              ),
+             Text(
+              _accessToken,
+              style: TextStyle(fontSize: 16),
+            ),
               SizedBox(height: 20),
               ElevatedButton(
   onPressed: () async {
