@@ -76,7 +76,7 @@ class _OrdersPageState extends State<OrdersPage> {
   }
 
   Future<void> _fetchOrders() async {
-    final url = Uri.parse('https://conectapro.madiffy.com/api/orders');
+    final url = Uri.parse('https://ortiza.terrabyteco.com/api/orders');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

@@ -10,11 +10,11 @@ import 'FormularioEspe.dart';
 import 'HomePage.dart';
 import 'Service.dart';
 
-
 class PerfilPage extends StatefulWidget {
-  const PerfilPage({Key? key, this.isGuest = false}) : super(key: key);
+  const PerfilPage({Key? key, this.isGuest = false, this.profileData}) : super(key: key);
 
   final bool isGuest;
+  final Map<String, dynamic>? profileData;
 
   @override
   State<PerfilPage> createState() => _PerfilPageState();
@@ -26,7 +26,6 @@ class _PerfilPageState extends State<PerfilPage> {
   late String _accessToken;
   int _selectedIndex = 2; // Agregar _selectedIndex como un campo de la clase
 
-
   @override
   void initState() {
     super.initState();
@@ -34,7 +33,7 @@ class _PerfilPageState extends State<PerfilPage> {
       _loadUserData();
     } else {
       // Inicializar datos de perfil y token para invitados
-      _profileData = null;
+      _profileData = widget.profileData;
       _accessToken = '';
     }
   }
@@ -70,98 +69,96 @@ class _PerfilPageState extends State<PerfilPage> {
           'Mi cuenta',
           style: TextStyle(color: Colors.white),
         ),
-        automaticallyImplyLeading: false, // Ocultar la flecha de retroceso
-
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          color: Colors.blue[600],
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(60.0),
+      body: SingleChildScrollView( // Envuelve el contenido en SingleChildScrollView
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.blue[600],
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(60.0),
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(20.0, 40.0, 20.0, 40.0),
-              child: Row(
-                children: [
-                  ClipOval(
-                    child: CircleAvatar(
-                      radius: 70,
-                      backgroundImage: AssetImage('perfil-placeholder.jpg'),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                color: Colors.white,
+                padding: const EdgeInsets.fromLTRB(20.0, 40.0, 20.0, 40.0),
+                child: Row(
+                  children: [
+                    ClipOval(
+                      child: CircleAvatar(
+                        radius: 70,
+                        backgroundImage: AssetImage('perfil-placeholder.jpg'),
+                      ),
                     ),
-                  ),
-                  SizedBox(width: 20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Hola,',
-                        style: TextStyle(
-                          fontSize: 30,
-                          color: Colors.grey[700],
+                    SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Hola,',
+                          style: TextStyle(
+                            fontSize: 30,
+                            color: Colors.grey[700],
+                          ),
                         ),
-                      ),
-                      Text(
-                        widget.isGuest ? 'Invitado' : (_profileData != null ? '${_profileData?['name']} ${_profileData?['surname'] ?? ''}' : 'Invitado'),
-                        style: TextStyle(
-                          fontSize: 30,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          widget.isGuest ? 'Invitado' : (_profileData != null ? '${_profileData?['name']} ${_profileData?['surname'] ?? ''}' : 'Invitado'),
+                          style: TextStyle(
+                            fontSize: 30,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: widget.isGuest ? _showLoginNotification : () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AccountPage()),
-                      );
-                    },
-                    child: _buildFeatureContainer(Icons.person, 'Información personal', () {
-                      widget.isGuest ? _showLoginNotification() : Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AccountPage()),
-                      );
-                    }),
-                  ),
-                  GestureDetector(
-                    onTap: widget.isGuest ? _showLoginNotification : () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => OrdersPage()),
-                      );
-                    },
-                    child: _buildFeatureContainer(Icons.settings, 'Mis pedidos', () {
-                      widget.isGuest ? _showLoginNotification() : Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => OrdersPage()),
-                      );
-                    }),
-                  ),
-                ],
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: widget.isGuest ? _showLoginNotification : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AccountPage()),
+                        );
+                      },
+                      child: _buildFeatureContainer(Icons.person, 'Información personal', () {
+                        widget.isGuest ? _showLoginNotification() : Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AccountPage()),
+                        );
+                      }),
+                    ),
+                    GestureDetector(
+                      onTap: widget.isGuest ? _showLoginNotification : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => OrdersPage()),
+                        );
+                      },
+                      child: _buildFeatureContainer(Icons.settings, 'Mis pedidos', () {
+                        widget.isGuest ? _showLoginNotification() : Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => OrdersPage()),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 30),
-            if (_profileData?['level_id'] == 3 && !widget.isGuest) _buildAdvancedOptions(),
-            SizedBox(height: 30),
-            if ((_profileData?['level_id'] == 1 || _profileData?['level_id'] == 2) && !widget.isGuest) _buildSpecialistBanner(),
-            SizedBox(height: 30),
-            Expanded(
-              child: Align(
+              SizedBox(height: 30),
+              if (_profileData?['level_id'] == 3 && !widget.isGuest) _buildAdvancedOptions(),
+              SizedBox(height: 30),
+              if ((_profileData?['level_id'] == 1 || _profileData?['level_id'] == 2) && !widget.isGuest) _buildSpecialistBanner(),
+              SizedBox(height: 30),
+              Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 20),
@@ -187,59 +184,11 @@ class _PerfilPageState extends State<PerfilPage> {
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Inicio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_offer),
-            label: 'Servicios',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.black,
-        onTap: _onItemTapped,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        selectedLabelStyle: TextStyle(fontSize: 12),
-        unselectedLabelStyle: TextStyle(fontSize: 12),
-      ),
     );
-  }
-
-   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    // Navegar a la página correspondiente según el índice seleccionado
-    switch (_selectedIndex) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage(title:"ConectaPro")),
-        );
-        break;
-      case 1:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ServicePage()),
-        );
-        break;
-      case 2:
-        // Ya estamos en la página de perfil
-        break;
-    }
   }
 
   Widget _buildFeatureContainer(IconData icon, String text, VoidCallback? onTap) {
@@ -289,25 +238,27 @@ class _PerfilPageState extends State<PerfilPage> {
     );
   }
 
-  Widget _buildSpecialistBanner() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.orange,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.star,
-              size: 40,
-              color: Colors.white,
-            ),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
+ Widget _buildSpecialistBanner() {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.orange,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column( // Utilizar Column para colocar el texto y el botón en vertical
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.star,
+                size: 40,
+                color: Colors.white,
+              ),
+              SizedBox(width: 16),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -328,32 +279,34 @@ class _PerfilPageState extends State<PerfilPage> {
                   ),
                 ],
               ),
+            ],
+          ),
+          SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FormularioPage()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.white,
+              onPrimary: Colors.orange,
             ),
-            SizedBox(width: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => FormularioPage()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                primary: Colors.white,
-                onPrimary: Colors.orange,
-              ),
-              child: Text(
-                'Convertirse',
-                style: TextStyle(
-                  color: Colors.orange,
-                  fontWeight: FontWeight.bold,
-                ),
+            child: Text(
+              'Convertirse',
+              style: TextStyle(
+                color: Colors.orange,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   void _goToLogin() {
     Navigator.pushReplacement(

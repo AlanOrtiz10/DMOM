@@ -60,7 +60,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<User> _fetchUser(int userId) async {
     final response =
-        await http.get(Uri.parse('https://conectapro.madiffy.com/api/users/$userId'));
+        await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/users/$userId'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> userData = jsonDecode(response.body);
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _fetchCategories() async {
-    final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/categories'));
+    final response = await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/categories'));
 
     if (response.statusCode == 200) {
       List<dynamic> categoryData = jsonDecode(response.body);
@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<Service>> _fetchServices() async {
-    final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/services'));
+    final response = await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/services'));
 
     if (response.statusCode == 200) {
       Iterable jsonResponse = jsonDecode(response.body);
@@ -434,7 +434,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _onItemTapped(int index) {
+void _onItemTapped(int index) {
   setState(() {
     _selectedIndex = index;
   });
@@ -454,10 +454,11 @@ class _HomePageState extends State<HomePage> {
       // Página de perfil
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => PerfilPage(isGuest: widget.isGuest)),
+        MaterialPageRoute(builder: (context) => PerfilPage(isGuest: widget.isGuest, profileData: _profileData)),
       );
       break;
   }
 }
+
 
 }

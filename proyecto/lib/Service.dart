@@ -24,7 +24,7 @@ class _ServicePageState extends State<ServicePage> {
   }
 
   Future<List<Service>> _fetchServices() async {
-    final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/services'));
+    final response = await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/services'));
 
     if (response.statusCode == 200) {
       Iterable jsonResponse = jsonDecode(response.body);

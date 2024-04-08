@@ -28,7 +28,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   Future<Category> fetchCategory(int categoryId) async {
     try {
-      final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/categories/$categoryId'));
+      final response = await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/categories/$categoryId'));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> categoryData = jsonDecode(response.body);
@@ -44,7 +44,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   Future<List<Service>> fetchServices() async {
     try {
-      final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/services'));
+      final response = await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/services'));
 
       if (response.statusCode == 200) {
         Iterable jsonResponse = jsonDecode(response.body);
@@ -209,7 +209,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   }
 
   Future<User> _fetchUser(int userId) async {
-    final response = await http.get(Uri.parse('https://conectapro.madiffy.com/api/users/$userId'));
+    final response = await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/users/$userId'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> userData = jsonDecode(response.body);

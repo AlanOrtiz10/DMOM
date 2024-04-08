@@ -41,7 +41,7 @@ class _ServicesPageState extends State<ServicesPage> {
 
   Future<Service> fetchService(int id) async {
     final response =
-        await http.get(Uri.parse('https://conectapro.madiffy.com/api/services/$id'));
+        await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/services/$id'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> serviceData = jsonDecode(response.body);
@@ -53,7 +53,7 @@ class _ServicesPageState extends State<ServicesPage> {
 
   Future<User> fetchUser(int userId) async {
     final response =
-        await http.get(Uri.parse('https://conectapro.madiffy.com/api/users/$userId'));
+        await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/users/$userId'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> userData = jsonDecode(response.body);
@@ -65,7 +65,7 @@ class _ServicesPageState extends State<ServicesPage> {
 
   Future<Specialist> fetchSpecialist(int specialistId) async {
     final response = await http
-        .get(Uri.parse('https://conectapro.madiffy.com/api/specialists/$specialistId'));
+        .get(Uri.parse('https://ortiza.terrabyteco.com/api/specialists/$specialistId'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> specialistData = jsonDecode(response.body);
@@ -77,7 +77,7 @@ class _ServicesPageState extends State<ServicesPage> {
 
   Future<List<Recommendation>> fetchRecommendations(int serviceId) async {
     final response =
-        await http.get(Uri.parse('https://conectapro.madiffy.com/api/recommendations'));
+        await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/recommendations'));
 
     if (response.statusCode == 200) {
       List<dynamic> responseData = jsonDecode(response.body);
@@ -170,7 +170,7 @@ class _ServicesPageState extends State<ServicesPage> {
               children: [
                 ClipRRect(
                   child: Image.network(
-                    'https://conectapro.madiffy.com/assets/services/${selectedService.Imagen}',
+                    'https://ortiza.terrabyteco.com/assets/services/${selectedService.Imagen}',
                     width: double.infinity,
                     height: 250,
                     fit: BoxFit.cover,

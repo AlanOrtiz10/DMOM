@@ -81,7 +81,7 @@ class _FormularioPageState extends State<FormularioPage> {
   }
 
 Future<void> _registerAsSpecialist() async {
-  final url = Uri.parse('https://conectapro.madiffy.com/api/specialists/create');
+  final url = Uri.parse('https://ortiza.terrabyteco.com/api/specialists/create');
 
   // Obtener los valores del formulario
   final String description = _descriptionController.text;
@@ -107,7 +107,7 @@ Future<void> _registerAsSpecialist() async {
     // Éxito al registrar como especialista
 
     // Actualizar el nivel del usuario a 3
-    final updateUrl = Uri.parse('https://conectapro.madiffy.com/api/users/update');
+    final updateUrl = Uri.parse('https://ortiza.terrabyteco.com/api/users/update');
     final updateResponse = await http.post(
       updateUrl,
       headers: {
@@ -149,7 +149,7 @@ Future<void> _registerAsSpecialist() async {
 
 
   Future<void> _fetchCategories() async {
-    final url = Uri.parse('https://conectapro.madiffy.com/api/categories');
+    final url = Uri.parse('https://ortiza.terrabyteco.com/api/categories');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -163,7 +163,7 @@ Future<void> _registerAsSpecialist() async {
   }
 
   Future<void> _fetchSpecialities() async {
-    final url = Uri.parse('https://conectapro.madiffy.com/api/specialities');
+    final url = Uri.parse('https://ortiza.terrabyteco.com/api/specialities');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

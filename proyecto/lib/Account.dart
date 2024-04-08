@@ -58,7 +58,7 @@ class _AccountPageState extends State<AccountPage> {
       return;
     }
 
-    final String apiUrl = 'https://conectapro.madiffy.com/api/users/update';
+    final String apiUrl = 'https://ortiza.terrabyteco.com/api/users/update';
     final response = await http.post(
       Uri.parse(apiUrl),
       body: {
@@ -115,78 +115,79 @@ class _AccountPageState extends State<AccountPage> {
           style: TextStyle(color: Colors.white),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Información de la cuenta',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+      body: SingleChildScrollView( // Agregar SingleChildScrollView para desplazamiento hacia abajo
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Información de la cuenta',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            ClipOval(
-              child: CircleAvatar(
-                radius: 60,
-                backgroundImage: AssetImage('perfil-placeholder.jpg'),
+              SizedBox(height: 20),
+              ClipOval(
+                child: CircleAvatar(
+                  radius: 60,
+                  backgroundImage: AssetImage('perfil-placeholder.jpg'),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Información básica',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+              SizedBox(height: 20),
+              Text(
+                'Información básica',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Nombre',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+              SizedBox(height: 10),
+              Text(
+                'Nombre',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            TextFormField(
-              controller: _nameController,
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Apellido', // New field for surname
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+              TextFormField(
+                controller: _nameController,
               ),
-            ),
-            TextFormField(
-              controller: _surnameController,
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Número de teléfono',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+              SizedBox(height: 10),
+              Text(
+                'Apellido', // New field for surname
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            TextFormField(
-              controller: _phoneController,
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Correo electrónico',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
+              TextFormField(
+                controller: _surnameController,
               ),
-            ),
-            TextFormField(
-              controller: _emailController,
-            ),
-            SizedBox(height: 20),
-           ElevatedButton(
+              SizedBox(height: 10),
+              Text(
+                'Número de teléfono',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextFormField(
+                controller: _phoneController,
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Correo electrónico',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              TextFormField(
+                controller: _emailController,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
   onPressed: () async {
     await _updateUserData();
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => PerfilPage()),
     );
@@ -194,7 +195,8 @@ class _AccountPageState extends State<AccountPage> {
   child: Text('Guardar cambios'),
 ),
 
-          ],
+            ],
+          ),
         ),
       ),
     );

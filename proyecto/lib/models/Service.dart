@@ -34,5 +34,5 @@ class Service {
 }
 
 
-  String get imageUrl => 'https://conectapro.madiffy.com/assets/services/$Imagen';
+  String get imageUrl => 'https://ortiza.terrabyteco.com/assets/services/$Imagen';
 }

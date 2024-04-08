@@ -20,5 +20,5 @@ class Category {
     );
   }
 
-  String get imageUrl => 'https://conectapro.madiffy.com/assets/categories/$Imagen';
+  String get imageUrl => 'https://ortiza.terrabyteco.com/assets/categories/$Imagen';
 }

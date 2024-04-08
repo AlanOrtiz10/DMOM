@@ -78,7 +78,7 @@ class _ContratacionesPageState extends State<ContratacionesPage> {
 
  
   Future<void> _fetchOrders() async {
-  final url = Uri.parse('https://conectapro.madiffy.com/api/orders');
+  final url = Uri.parse('https://ortiza.terrabyteco.com/api/orders');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -156,7 +156,7 @@ class _ContratacionesPageState extends State<ContratacionesPage> {
   }
 
 Future<void> _updateOrderStatus(int orderId, String newStatus) async {
-  final url = Uri.parse('https://conectapro.madiffy.com/api/orders/update');
+  final url = Uri.parse('https://ortiza.terrabyteco.com/api/orders/update');
   final response = await http.post(
     url,
     headers: {

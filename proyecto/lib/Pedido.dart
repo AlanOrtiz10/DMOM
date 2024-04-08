@@ -121,7 +121,7 @@ class _PedidoPageState extends State<PedidoPage> {
   }
 
   Future<void> _enviarPedido() async {
-    final url = Uri.parse('https://conectapro.madiffy.com/api/orders/create');
+    final url = Uri.parse('https://ortiza.terrabyteco.com/api/orders/create');
     final response = await http.post(
       url,
       body: {

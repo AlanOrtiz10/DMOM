@@ -7,7 +7,7 @@ import 'dart:convert';
 
 Future<List<Specialist>> fetchSpecialists() async {
   final response =
-      await http.get(Uri.parse('https://conectapro.madiffy.com/api/specialists'));
+      await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/specialists'));
 
   if (response.statusCode == 200) {
     Iterable jsonResponse = jsonDecode(response.body);
@@ -21,7 +21,7 @@ Future<List<Specialist>> fetchSpecialists() async {
 
 Future<User> fetchUser(int userId) async {
   final response =
-      await http.get(Uri.parse('https://conectapro.madiffy.com/api/users/$userId'));
+      await http.get(Uri.parse('https://ortiza.terrabyteco.com/api/users/$userId'));
 
   if (response.statusCode == 200) {
     Map<String, dynamic> userData = jsonDecode(response.body);
@@ -33,7 +33,7 @@ Future<User> fetchUser(int userId) async {
 
 Future<Category> fetchCategory(int categoryId) async {
   final response = await http.get(
-      Uri.parse('https://conectapro.madiffy.com/api/categories/$categoryId'));
+      Uri.parse('https://ortiza.terrabyteco.com/api/categories/$categoryId'));
 
   if (response.statusCode == 200) {
     Map<String, dynamic> categoryData = jsonDecode(response.body);
