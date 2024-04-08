@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'pedido.dart'; // Importa tu archivo Pedido.dart
+import 'Pedido.dart'; // Importa tu archivo Pedido.dart
 import 'package:intl/intl.dart';
 import 'package:proyecto/models/Service.dart';
 import 'package:proyecto/models/User.dart';
